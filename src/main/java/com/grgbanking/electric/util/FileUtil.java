@@ -132,6 +132,49 @@ public class FileUtil {
 	}
 	
 	/**
+	 * 写入文件
+	 * @param fileName
+	 * @param content
+	 * @return
+	 */
+	public static File writeFile(String fileName, byte[] content) {
+		if (fileName == null || "".equals(fileName)) {
+			throw new IllegalArgumentException("文件名不能为空");
+		}
+		if (content == null || "".equals(content)) {
+			throw new IllegalArgumentException("文件内容不能为空");
+		}
+		File file = new File(fileName);
+		if (!file.exists()) {
+			try {
+				file.createNewFile(); // 创建文件
+			} catch (IOException e) {
+				throw new IllegalArgumentException("创建文件失败");
+			}
+		}
+
+		RandomAccessFile randomFile = null;
+		try {
+			randomFile = new RandomAccessFile(file, "rw");
+			long fileLength = randomFile.length();
+			// 将写文件指针移到文件尾
+			randomFile.seek(fileLength);
+			randomFile.write(content);
+		} catch (FileNotFoundException e) {
+			throw new IllegalArgumentException("文件不存在");
+		} catch (IOException e) {
+			throw new IllegalArgumentException("写人文件失败");
+		} finally {
+			if (randomFile != null) {
+				try {
+					randomFile.close();
+				} catch (IOException e) {}
+			}
+		}
+		return file;
+	}
+	
+	/**
 	 * 删除文件
 	 * @param fileName
 	 */
